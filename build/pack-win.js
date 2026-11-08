@@ -163,7 +163,7 @@ function packageZip(appDir) {
   // 附带源码，方便二次开发
   const srcOut = path.join(pkgRoot, 'source');
   fs.mkdirSync(srcOut, { recursive: true });
-  for (const item of ['src', 'build', 'profiles', 'test-extensions', 'package.json', 'README.md', 'LICENSE']) {
+  for (const item of ['src', 'build', 'docs', 'profiles', 'test-extensions', 'package.json', 'README.md', 'LICENSE']) {
     const from = path.join(ROOT, item);
     if (!fs.existsSync(from)) continue;
     fs.cpSync(from, path.join(srcOut, item), { recursive: true });
