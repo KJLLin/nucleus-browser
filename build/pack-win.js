@@ -44,6 +44,9 @@ function prepareStage() {
   fs.cpSync(path.join(ROOT, 'src'), path.join(STAGE, 'src'), { recursive: true });
   // 配置 profile 随包发布：没有这一层，--profile=minimal 之类会在发行版里失效
   fs.cpSync(path.join(ROOT, 'profiles'), path.join(STAGE, 'profiles'), { recursive: true });
+  // 文档随包发布：README 里引用了 docs/WINDOW-UI.md，缺了它链接就是断的
+  const docsDir = path.join(ROOT, 'docs');
+  if (fs.existsSync(docsDir)) fs.cpSync(docsDir, path.join(STAGE, 'docs'), { recursive: true });
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   // 运行期不需要任何依赖：删掉脚本与开发依赖，让 asar 干净
   delete pkg.devDependencies;
