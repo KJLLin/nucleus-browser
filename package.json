@@ -1,7 +1,7 @@
 {
   "name": "nucleus-browser",
   "productName": "Nucleus",
-  "version": "0.1.1-rc1",
+  "version": "0.1.2-rc2",
   "description": "Nucleus — 基于 Cordis 的「一切皆插件」浏览器：槽位化界面、类型化 RPC、配置层与浏览器扩展支持。",
   "main": "src/main/main.js",
   "author": "KJLLin",

@@ -358,6 +358,11 @@ function installIpc(ctx) {
     return true;
   });
 
+  handle('nucleus:downloads:control', ({ pluginId, id, action }) => {
+    need(pluginId, 'downloads');
+    return downloads.control(id, action);
+  });
+
   // ---------- 会话 ----------
 
   handle('nucleus:session:clear', async ({ pluginId, what }) => {

@@ -87,6 +87,8 @@ const P = {
   'arrow-down-left': ['M17 7L7 17', 'M17 17H7V7'],
   'volume-2': ['M11 5L6 9H2v6h4l5 4z', 'M15.5 8.5a5 5 0 0 1 0 7', 'M19 5a9 9 0 0 1 0 14'],
   'volume-x': ['M11 5L6 9H2v6h4l5 4z', 'M22 9l-6 6', 'M16 9l6 6'],
+  play: ['M8 5l11 7-11 7z'],
+  pause: ['M9 5v14', 'M15 5v14'],
   'corner-down-left': ['M9 10l-5 5 5 5', 'M20 4v7a4 4 0 0 1-4 4H4'],
   hash: ['M4 9h16', 'M4 15h16', 'M10 3L8 21', 'M16 3l-2 18'],
   filter: ['M22 3H2l8 9.5V19l4 2v-8.5z'],

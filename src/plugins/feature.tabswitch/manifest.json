@@ -1,0 +1,24 @@
+{
+  "id": "feature.tabswitch",
+  "name": "标签切换器",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "一个可搜索的标签列表，按最近使用排序；Ctrl+Shift+A 打开，键盘直达。",
+  "ui": "ui.js",
+  "styles": [
+    "tabswitch.css"
+  ],
+  "permissions": [
+    "commands"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "tabs.switch",
+        "title": "切换标签页（搜索）",
+        "icon": "layers",
+        "keybinding": "Ctrl+Shift+A"
+      }
+    ]
+  }
+}

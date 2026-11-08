@@ -188,6 +188,16 @@ const SPECS = {
     description: '当前下载列表',
     permission: 'downloads',
   },
+  'nucleus:downloads:control': {
+    params: T.object({
+      pluginId: ID,
+      id: T.number(),
+      action: T.enum(['pause', 'resume', 'cancel']),
+    }),
+    result: T.boolean(),
+    description: '暂停 / 继续 / 取消下载',
+    permission: 'downloads',
+  },
   'nucleus:session:clear': {
     params: T.object({ pluginId: ID, what: T.enum(['cache', 'storage', 'all']) }),
     result: T.boolean(),

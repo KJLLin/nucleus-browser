@@ -42,6 +42,25 @@ export function displayUrl(url) {
   return url;
 }
 
+// 补全条目里的命中高亮。必须自己转义 —— 标题和历史记录都是外部字符串，
+// 直接拼进 innerHTML 等于给网页内容开了一个注入口子。
+const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ESCAPES[c]);
+}
+
+function mark(text, query) {
+  const raw = String(text ?? '');
+  const q = String(query || '').trim();
+  if (!q) return escapeHtml(raw);
+  const i = raw.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return escapeHtml(raw);
+  return escapeHtml(raw.slice(0, i))
+    + `<b>${escapeHtml(raw.slice(i, i + q.length))}</b>`
+    + escapeHtml(raw.slice(i + q.length));
+}
+
 export function initOmnibox(nucleus) {
   const left = nucleus.regions.el('nav-left');
   const center = nucleus.regions.el('nav-center');
@@ -91,6 +110,8 @@ export function initOmnibox(nucleus) {
     autocomplete: 'off',
   });
   const box = h('div', { class: 'omnibox' }, schemeIcon, input);
+  const loadbar = h('div', { class: 'loadbar' });
+  box.appendChild(loadbar);
   const wrap = h('div', { class: 'omnibox-wrap' }, box);
 
   // 先把地址栏注册进 region.nav-center —— 顺序不能反：
@@ -111,6 +132,48 @@ export function initOmnibox(nucleus) {
   const actions = nucleus.slots.outlet('shell.omnibox.actions', { tab: nucleus.tabs.active() });
   actions.classList.add('omni-actions');
   box.appendChild(actions);
+
+  // 缩放徽章：只在非 100% 时出现。它必须「在地址栏里」——
+  // 缩放是当前页面的属性，不是浏览器的属性。
+  const zoomChip = h('button', { class: 'zoom-chip', title: '页面缩放（点击恢复 100%）' });
+  zoomChip.addEventListener('click', () => nucleus.commands.execute('zoom.reset'));
+  box.insertBefore(zoomChip, actions);
+
+  // ---------- 加载进度 ----------
+
+  let progressTimer = null;
+  let progressValue = 0;
+  let progressHideTimer = null;
+
+  function paintProgress() {
+    loadbar.style.width = `${progressValue}%`;
+    loadbar.classList.toggle('on', progressValue > 0);
+    loadbar.classList.toggle('done', progressValue >= 100);
+  }
+
+  function startProgress() {
+    if (progressHideTimer) { clearTimeout(progressHideTimer); progressHideTimer = null; }
+    if (progressTimer) return;
+    if (progressValue <= 0 || progressValue >= 100) progressValue = 10;
+    paintProgress();
+    progressTimer = setInterval(() => {
+      // 越接近 88% 越慢：不知道还剩多久时，这是最诚实的表达
+      progressValue += (88 - progressValue) * 0.08;
+      paintProgress();
+    }, 150);
+  }
+
+  function finishProgress() {
+    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+    if (progressValue <= 0) return;
+    progressValue = 100;
+    paintProgress();
+    progressHideTimer = setTimeout(() => {
+      loadbar.classList.remove('on', 'done');
+      progressValue = 0;
+      loadbar.style.width = '0';
+    }, 460);
+  }
 
   let suggestEl = null;
   let suggestItems = [];
@@ -157,6 +220,54 @@ export function initOmnibox(nucleus) {
 
   // ---------- 状态同步 ----------
 
+  /** 站点级缩放记忆：{ host: factor }。1.0 不记，避免配置里堆一堆无意义的 100% */
+  const ZOOM_KEY = 'siteZoom';
+
+  function hostOf(url) {
+    try {
+      const u = new URL(url);
+      return u.protocol === 'http:' || u.protocol === 'https:' ? u.hostname : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function zoomBook() {
+    const v = nucleus.settings.get(ZOOM_KEY, {});
+    return v && typeof v === 'object' ? v : {};
+  }
+
+  function rememberZoom(host, factor) {
+    if (!host) return;
+    const book = Object.assign({}, zoomBook());
+    if (Math.abs(factor - 1) < 0.01) delete book[host];
+    else book[host] = Math.round(factor * 100) / 100;
+    nucleus.settings.set(ZOOM_KEY, book);
+  }
+
+  /** 每个标签进入新站点时应用一次记忆，之后不再覆盖用户的手动调整 */
+  let appliedZoomFor = null;
+
+  function applySiteZoom(tab) {
+    if (!tab || !tab.url) return;
+    const host = hostOf(tab.url);
+    if (!host) return;
+    const key = `${tab.id}:${host}`;
+    if (appliedZoomFor === key) return;
+    appliedZoomFor = key;
+    const want = zoomBook()[host];
+    if (want && Math.abs((tab.zoom || 1) - want) > 0.01) {
+      nucleus.tabs.setZoom(tab.id, want);
+    }
+  }
+
+  function setZoom(tab, factor) {
+    if (!tab) return;
+    const v = nucleus.tabs.setZoom(tab.id, factor);
+    rememberZoom(hostOf(tab.url), v);
+    syncFromTab();
+  }
+
   function syncFromTab() {
     const tab = nucleus.tabs.active();
     nucleus.slots.updateOutlet(actions, { tab });
@@ -173,6 +284,14 @@ export function initOmnibox(nucleus) {
     btnReload.innerHTML = icon(tab && tab.loading ? 'x' : 'rotate-cw', { size: 16 });
     btnReload.title = tab && tab.loading ? '停止加载（Esc）' : '重新加载（F5）';
     paintScheme(tab ? tab.url : '');
+
+    if (tab && tab.loading) startProgress();
+    else finishProgress();
+
+    const zoom = tab && Number.isFinite(tab.zoom) ? tab.zoom : 1;
+    zoomChip.textContent = `${Math.round(zoom * 100)}%`;
+    zoomChip.classList.toggle('show', Math.abs(zoom - 1) > 0.01);
+    applySiteZoom(tab);
 
     if (!editing) {
       closeSuggest();
@@ -235,16 +354,25 @@ export function initOmnibox(nucleus) {
 
   function renderSuggest(items) {
     if (document.activeElement !== input) return;
+    const fresh = !suggestEl; // 只有「从无到有」才播进场，敲字重排不闪
     closeSuggest();
     if (!items.length) return;
     suggestItems = items;
     suggestIndex = 0;
 
-    suggestEl = h('div', { class: 'suggest' });
+    const q = input.value.trim();
+    suggestEl = h('div', { class: `suggest ${fresh ? 'fresh' : ''}` });
+    let lastKind = null;
     items.forEach((item, idx) => {
+      // 历史记录单独成组：用户需要知道「这是我去过的地方」而不是搜索建议
+      if (item.kind === 'history' && lastKind !== 'history') {
+        suggestEl.appendChild(h('div', { class: 'suggest-group' }, '历史记录'));
+      }
+      lastKind = item.kind;
+
       const row = h('div', { class: `suggest-item ${idx === 0 ? 'active' : ''}` },
         h('span', { class: 's-icon', html: icon(item.icon, { size: 14 }) }),
-        h('span', { class: 's-main' }, item.title),
+        h('span', { class: 's-main', html: mark(item.title, q) }),
         h('span', { class: 's-hint ellipsis' }, item.hint || '')
       );
       row.addEventListener('mousedown', (e) => {
@@ -260,7 +388,8 @@ export function initOmnibox(nucleus) {
   function setSuggestIndex(idx) {
     suggestIndex = idx;
     if (!suggestEl) return;
-    [...suggestEl.children].forEach((c, i) => c.classList.toggle('active', i === idx));
+    // 用 .suggest-item 而不是 children：分组标题也占一个子节点
+    [...suggestEl.querySelectorAll('.suggest-item')].forEach((c, i) => c.classList.toggle('active', i === idx));
   }
 
   function closeSuggest() {
@@ -408,8 +537,7 @@ export function initOmnibox(nucleus) {
     icon: 'zoom-in',
     handler: () => {
       const t = T();
-      if (t) nucleus.tabs.setZoom(t.id, Math.min(5, (t.zoom || 1) + 0.1));
-      syncFromTab();
+      if (t) setZoom(t, Math.min(5, (t.zoom || 1) + 0.1));
     },
   });
 
@@ -418,8 +546,7 @@ export function initOmnibox(nucleus) {
     icon: 'zoom-out',
     handler: () => {
       const t = T();
-      if (t) nucleus.tabs.setZoom(t.id, Math.max(0.25, (t.zoom || 1) - 0.1));
-      syncFromTab();
+      if (t) setZoom(t, Math.max(0.25, (t.zoom || 1) - 0.1));
     },
   });
 
@@ -428,8 +555,7 @@ export function initOmnibox(nucleus) {
     icon: 'maximize-2',
     handler: () => {
       const t = T();
-      if (t) nucleus.tabs.setZoom(t.id, 1);
-      syncFromTab();
+      if (t) setZoom(t, 1);
     },
   });
 

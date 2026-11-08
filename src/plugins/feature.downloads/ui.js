@@ -131,14 +131,38 @@ export async function activate(nucleus) {
           width: `${item.state === 'completed' ? 100 : (pct || 8)}%`,
           background: item.state === 'completed' ? 'var(--ok)'
             : item.state === 'progressing' ? 'var(--accent)' : 'var(--danger)',
-          transition: 'width 240ms linear',
+          transition: 'width 240ms cubic-bezier(0.16, 1, 0.3, 1)',
         },
       }));
+
+      const control = (action, iconName, title) => h('button', {
+        class: 'icon-btn',
+        title,
+        html: icon(iconName, { size: 13 }),
+        onclick: async (e) => {
+          e.stopPropagation();
+          try {
+            await nucleus.invoke('nucleus:downloads:control', { id: item.id, action });
+          } catch (err) {
+            nucleus.ui.toast(err.message || '操作失败', { type: 'error' });
+          }
+        },
+      });
+
+      const actions = item.state === 'progressing'
+        ? h('span', { class: 'hstack', style: { gap: '2px' } },
+            item.paused
+              ? control('resume', 'play', '继续下载')
+              : control('pause', 'pause', '暂停下载'),
+            control('cancel', 'x', '取消下载')
+          )
+        : null;
 
       const row = h('div', { class: 'list-item', style: { flexDirection: 'column', alignItems: 'stretch', gap: '2px', padding: '9px 12px' } },
         h('div', { class: 'hstack' },
           h('span', { style: { color: 'var(--text-faint)', display: 'flex' }, html: icon('file-text', { size: 13 }) }),
           h('span', { class: 'grow ellipsis', style: { color: 'var(--text)' } }, item.filename),
+          actions,
           item.state === 'completed'
             ? h('button', {
                 class: 'icon-btn',

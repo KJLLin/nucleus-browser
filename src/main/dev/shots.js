@@ -192,6 +192,38 @@ module.exports = async function capture({ win, plugins, app }) {
     await sleep(600);
   });
 
+  // ---------- 标签切换器 ----------
+  await run('tabswitch', async () => {
+    await ui(`(() => {
+      const a = window.__nucleusApp;
+      a.tabs.create({ url: 'https://example.com', active: false });
+      a.tabs.create({ url: 'https://developer.mozilla.org', active: false });
+      a.tabs.create({ url: 'nucleus://feature.inspector/index.html', active: false });
+      return 'ok';
+    })()`);
+    await sleep(1600);
+    await command('tabs.switch');
+    await sleep(600);
+    await shot('18-tabswitch');
+    await ui(`(() => {
+      const el = document.querySelector('.ts-backdrop');
+      if (el) { el.classList.add('closing'); setTimeout(() => el.remove(), 220); }
+      return 'ok';
+    })()`);
+    await sleep(320);
+    const cleaned = await ui(`(() => {
+      try {
+        const a = window.__nucleusApp;
+        for (const id of a.tabs.order.slice(1)) a.tabs.close(id);
+        return 'ok';
+      } catch (e) {
+        return 'ERR ' + (e && e.stack ? e.stack : e);
+      }
+    })()`);
+    if (cleaned !== 'ok') console.log('TABSWITCH_CLEAN ' + cleaned);
+    await sleep(900);
+  });
+
   // ---------- 快捷键速查 ----------
   await run('shortcuts', async () => {
     await command('shortcuts.help');

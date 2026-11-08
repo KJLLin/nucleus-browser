@@ -114,6 +114,7 @@ form.addEventListener('submit', (e) => {
 // ---------- 快捷方式 ----------
 
 const grid = document.getElementById('shortcuts');
+let dragIndex = -1;
 
 function hashColor(str) {
   let h = 0;
@@ -127,31 +128,91 @@ function initial(name) {
   return trimmed.slice(0, 2).toUpperCase();
 }
 
+function clearDropMarks() {
+  for (const el of grid.querySelectorAll('.drop-target')) el.classList.remove('drop-target');
+}
+
 function renderShortcuts() {
   const list = store.get(KEY_SHORTCUTS, DEFAULT_SHORTCUTS);
   grid.innerHTML = '';
+
+  if (!list.length) {
+    const empty = document.createElement('div');
+    empty.className = 'sc-empty';
+    empty.textContent = '还没有快捷方式。点下面的「+ 添加快捷方式」加一个吧。';
+    grid.appendChild(empty);
+    return;
+  }
+
   list.forEach((item, idx) => {
     const card = document.createElement('div');
     card.className = 'sc';
     card.title = item.url;
+    card.draggable = true;
     card.innerHTML = `
       <div class="avatar" style="background:${hashColor(item.name || item.url)}">${initial(item.name)}</div>
       <div class="label"></div>
       <button class="del" title="移除">×</button>`;
     card.querySelector('.label').textContent = item.name || item.url;
+
     card.addEventListener('click', () => { window.location.href = item.url; });
+
     card.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation();
-      const next = list.slice();
+      const next = store.get(KEY_SHORTCUTS, DEFAULT_SHORTCUTS).slice();
       next.splice(idx, 1);
       store.set(KEY_SHORTCUTS, next);
       renderShortcuts();
     });
+
+    // ---- 拖拽排序 ----
+    card.addEventListener('dragstart', (e) => {
+      dragIndex = idx;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      // Firefox 需要 setData 才会真正开始拖拽；Electron 里同样要兜一下
+      try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) { /* ignore */ }
+    });
+    card.addEventListener('dragend', () => {
+      dragIndex = -1;
+      card.classList.remove('dragging');
+      clearDropMarks();
+    });
+    card.addEventListener('dragover', (e) => {
+      if (dragIndex < 0 || dragIndex === idx) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      clearDropMarks();
+      card.classList.add('drop-target');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drop-target'));
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      clearDropMarks();
+      if (dragIndex < 0 || dragIndex === idx) return;
+      const next = store.get(KEY_SHORTCUTS, DEFAULT_SHORTCUTS).slice();
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(idx, 0, moved);
+      store.set(KEY_SHORTCUTS, next);
+      dragIndex = -1;
+      renderShortcuts();
+    });
+
     grid.appendChild(card);
   });
 }
 
 renderShortcuts();
+
+// 单键 / 聚焦搜索框：新标签页里最常做的动作，不该要求先用鼠标点一下
+document.addEventListener('keydown', (e) => {
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+  const el = document.activeElement;
+  if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return;
+  e.preventDefault();
+  input.focus();
+  input.select();
+});
 
 // ---------- 添加快捷方式（自建轻量表单，Electron 不支持 window.prompt） ----------
 

@@ -38,11 +38,19 @@ export function initTabstrip(nucleus) {
   });
   newBtn.addEventListener('click', () => nucleus.tabs.create({ url: newTabUrl }));
 
+  // 双击标签条空白处新建 —— 浏览器里最顺手的一个隐形手势
+  strip.addEventListener('dblclick', (e) => {
+    if (e.target.closest('.tab') || e.target.closest('.tab-new')) return;
+    nucleus.tabs.create({ url: newTabUrl });
+  });
+
   function makeView(tab) {
     const favEl = h('span', { class: 'favicon' });
     const titleEl = h('span', { class: 'tab-title' });
     const closeEl = h('button', { class: 'tab-close', title: '关闭', html: icon('x', { size: 9 }) });
-    const el = h('div', { class: 'tab', dataset: { id: tab.id } }, favEl, titleEl, closeEl);
+    const el = h('div', { class: 'tab entering', dataset: { id: tab.id } }, favEl, titleEl, closeEl);
+    // 进场动画只播一次：之后 reorder / 重绘都不该再抖一下
+    el.addEventListener('animationend', () => el.classList.remove('entering'), { once: true });
 
     closeEl.addEventListener('mousedown', (e) => e.stopPropagation());
     closeEl.addEventListener('click', (e) => {
@@ -67,8 +75,13 @@ export function initTabstrip(nucleus) {
       view.favEl.innerHTML = '<span class="tab-loading"></span>';
       return;
     }
-    if (tab.audible || tab.muted) {
-      view.favEl.innerHTML = icon(tab.muted ? 'volume-x' : 'volume-2', { size: 14 });
+    if (tab.audible && !tab.muted) {
+      // 三根跳动的竖条：声音是「持续状态」，静态喇叭图标看不出来
+      view.favEl.innerHTML = '<span class="tab-eq"><i></i><i></i><i></i></span>';
+      return;
+    }
+    if (tab.muted) {
+      view.favEl.innerHTML = icon('volume-x', { size: 14 });
       return;
     }
     if (tab.favicon) {
@@ -93,13 +106,25 @@ export function initTabstrip(nucleus) {
     paintFavicon(view, tab);
   }
 
+  /**
+   * 让标签「收起」再消失，而不是从布局里瞬间抽走。
+   * 关键点：flex-grow 必须归零 —— 否则 flex-basis 变 0 之后它还会按 grow
+   * 去抢剩余空间，宽度不动，动画看起来就是「没反应，然后突然没了」。
+   */
+  function retire(el) {
+    if (!el || el.classList.contains('leaving')) return;
+    el.classList.add('leaving');
+    el.style.pointerEvents = 'none';
+    setTimeout(() => el.remove(), 240);
+  }
+
   function sync() {
     const tabs = nucleus.tabs.list();
     const alive = new Set(tabs.map((t) => t.id));
 
     for (const [id, view] of Array.from(views)) {
       if (!alive.has(id)) {
-        view.el.remove();
+        retire(view.el);
         views.delete(id);
       }
     }

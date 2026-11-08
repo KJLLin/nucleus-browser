@@ -45,6 +45,12 @@ class DownloadService {
     this.items = [];
     this._seq = 0;
     this._listeners = new Set();
+    /**
+     * id -> Electron DownloadItem。
+     * 刻意不挂在 rec 上：rec 会被 IPC 序列化送进渲染层，
+     * 而 DownloadItem 是不可克隆的原生对象，混进去会直接让整条通道抛错。
+     */
+    this.handles = new Map();
   }
 
   install(session) {
@@ -62,8 +68,10 @@ class DownloadService {
         startedAt: Date.now(),
         endedAt: null,
         paused: false,
+        canResume: false,
       };
       this.items.unshift(rec);
+      this.handles.set(id, item);
       if (this.items.length > 200) this.items.length = 200;
       this.bus.emit('downloads:started', Object.assign({}, rec));
 
@@ -72,6 +80,7 @@ class DownloadService {
         rec.totalBytes = item.getTotalBytes() || rec.totalBytes;
         rec.savePath = item.getSavePath() || rec.savePath;
         rec.paused = item.isPaused();
+        rec.canResume = item.canResume();
         this.bus.emit('downloads:updated', Object.assign({}, rec));
       };
 
@@ -79,10 +88,34 @@ class DownloadService {
       item.on('done', (_e, state) => {
         rec.state = state; // completed | cancelled | interrupted
         rec.receivedBytes = item.getReceivedBytes();
+        rec.paused = false;
+        rec.canResume = false;
         rec.endedAt = Date.now();
+        this.handles.delete(id);
         this.bus.emit('downloads:done', Object.assign({}, rec));
       });
     });
+  }
+
+  /**
+   * 暂停 / 继续 / 取消。
+   * 只有这三个动作暴露给插件 —— 下载项能做的事还有很多（改保存路径、改 UA…），
+   * 但那些属于「策略」，该由宿主决定，不该成为插件的能力面。
+   */
+  control(id, action) {
+    const item = this.handles.get(Number(id));
+    if (!item) throw new Error('下载任务不存在或已结束');
+    if (action === 'pause') {
+      if (!item.isPaused()) item.pause();
+    } else if (action === 'resume') {
+      if (item.canResume()) item.resume();
+      else throw new Error('该下载已无法继续');
+    } else if (action === 'cancel') {
+      item.cancel();
+    } else {
+      throw new Error(`未知的下载操作：${action}`);
+    }
+    return true;
   }
 
   on(handler, owner) {

@@ -25,6 +25,7 @@ plugins:
     - feature.tabsleep
     - feature.notes
     - feature.shortcuts
+    - feature.tabswitch
     - feature.privacy
 
 settings:

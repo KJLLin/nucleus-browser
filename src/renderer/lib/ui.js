@@ -8,6 +8,28 @@ import { icon } from './icons.js';
 const overlayRoot = () => document.getElementById('overlay');
 const toastRoot = () => document.getElementById('toasts');
 
+/**
+ * 播放退场动画后再移除节点。
+ * 动效归 CSS，节奏归 JS：这里只负责「加类 → 等一个时长 → 摘掉」。
+ * 元素被提前摘走（例如父容器整体清空）时不会报错。
+ */
+export function animateOut(node, cls = 'closing', duration = 180) {
+  if (!node || !node.isConnected) return Promise.resolve();
+  return new Promise((resolve) => {
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      node.remove();
+      resolve();
+    };
+    node.classList.add(cls);
+    node.addEventListener('animationend', done, { once: true });
+    // 兜底：动画被系统「减少动态效果」关掉时不会有 animationend
+    setTimeout(done, duration + 40);
+  });
+}
+
 // ---------- Toast ----------
 
 export function toast(message, { type = 'info', timeout = 3200 } = {}) {
@@ -81,8 +103,9 @@ export function modal({
       if (done) return;
       done = true;
       document.removeEventListener('keydown', onKey, true);
-      scrim.remove();
-      resolve(value);
+      // 先让遮罩与卡片退场，再 resolve —— 否则调用方立刻打开下一个对话框时
+      // 旧的会「闪」在新的一层上面
+      animateOut(scrim, 'closing', 200).then(() => resolve(value));
     }
 
     document.addEventListener('keydown', onKey, true);
@@ -146,20 +169,25 @@ export function menu(items, { x = 0, y = 0, align = 'left' } = {}) {
   }
 
   document.body.appendChild(el);
-  const rect = el.getBoundingClientRect();
-  let left = align === 'right' ? x - rect.width : x;
+  // 用 offsetWidth 而不是 getBoundingClientRect：菜单的进场动画带 scale，
+  // 后者会把 0.965 倍后的尺寸算进来，定位就会偏几像素。
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
+  let left = align === 'right' ? x - w : x;
   let top = y;
-  if (left + rect.width > window.innerWidth - 8) left = window.innerWidth - rect.width - 8;
+  if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
   if (left < 8) left = 8;
-  if (top + rect.height > window.innerHeight - 8) top = y - rect.height;
+  if (top + h > window.innerHeight - 8) top = y - h;
   if (top < 8) top = 8;
   el.style.left = `${left}px`;
   el.style.top = `${top}px`;
+  // 从点击的位置长出来，而不是从菜单左上角
+  el.style.setProperty('--menu-origin', `${Math.max(0, Math.min(w, x - left))}px ${Math.max(0, Math.min(h, y - top))}px`);
 
   function close() {
-    el.remove();
     document.removeEventListener('mousedown', onDoc, true);
     document.removeEventListener('keydown', onKey, true);
+    animateOut(el, 'closing', 120);
   }
   function onDoc(e) {
     if (!el.contains(e.target)) close();
@@ -239,8 +267,8 @@ export function palette({
   }
 
   function close() {
-    scrim.remove();
     document.removeEventListener('keydown', onKey, true);
+    animateOut(scrim, 'closing', 200);
   }
 
   function onKey(e) {

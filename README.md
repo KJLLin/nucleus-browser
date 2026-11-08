@@ -2,7 +2,7 @@
 
 > 一个「一切皆插件」的浏览器，底座是 Cordis —— 与 DeepSeek Harness 同一个插件内核。
 
-**版本 0.1.1-rc1** · 首个公开发布版，仍在开发中。
+**版本 0.1.2-rc2** · 公开发布预览版，仍在开发中。
 
 Nucleus 用 Chromium 108 内核（Electron 22.3.27，**最后一个支持 Windows 7 的版本**）构建。
 插件树、可逆副作用、服务注册与依赖注入由 Cordis 负责；核只保留 Cordis 不提供的部分：
@@ -89,7 +89,7 @@ Nucleus 尝试另一条路 —— 把内核压到最小，把功能全部外置�
 
 ## 四、内置插件
 
-21 个插件，覆盖一个浏览器该有的全部日常能力。界面部分合并为单一的 `ui.shell`，
+22 个插件，覆盖一个浏览器该有的全部日常能力。界面部分合并为单一的 `ui.shell`，
 另有「运行时自省」与「浏览器扩展」两个元能力插件。
 
 | 插件 ID | 名称 | 贡献 |
@@ -115,6 +115,7 @@ Nucleus 尝试另一条路 —— 把内核压到最小，把功能全部外置�
 | `feature.notes` | 侧边便签 | 右侧抽屉里的随手记，输入即保存，数据在插件自己的存储命名空间 |
 | `feature.shortcuts` | 快捷键速查 | `F1` 打开，直接读命令注册表，按来源插件分组 |
 | `feature.privacy` | 隐私清理 | 分别清除缓存与站点数据，记录上次清理时间 |
+| `feature.tabswitch` | 标签切换器 | `Ctrl+Shift+A` 打开可搜索的标签列表，按最近使用排序 |
 
 ---
 
@@ -353,7 +354,7 @@ Nucleus.exe --profile=minimal --dump-config
 
 内置四个 profile：`desktop`（完整）、`minimal`（只有界面 + 设置）、
 `kiosk`（演示）、`default`（其余 profile 的底座）。
-实测 `--profile=minimal` 后禁用 17 个插件，快捷键从 38 条降到 19 条。
+实测 `--profile=minimal` 后禁用 18 个插件，快捷键从 39 条降到 19 条。
 
 ### 5.9 浏览器扩展
 
@@ -489,6 +490,58 @@ const bridge = window.__nucleusTakeBridge();
 | `feature.notes` | 侧边便签 | 复用侧边栏容器，输入 400ms 防抖落盘，关窗前强制写盘 |
 | `feature.shortcuts` | 快捷键速查 | 直接读命令注册表，插件新增命令自动出现 |
 | `feature.privacy` | 隐私清理 | 缓存与站点数据分开确认，不碰书签/历史/下载 |
+
+
+### 5.11 动效与交互打磨（v0.1.2-rc2）
+
+这一版没有加新架构，只做两件事：让界面「跟手」，让高频动作少一次鼠标。
+
+#### 动效层
+
+新增 `src/renderer/styles/motion.css`，把动效收敛成一套变量与关键帧：
+
+| 维度 | 取值 | 理由 |
+| --- | --- | --- |
+| 时长 | `--dur-1` 110ms / `--dur-2` 170ms / `--dur-3` 240ms / `--dur-4` 360ms | 微反馈、元素、容器、页面级四档，够用且不冗余 |
+| 缓动 | 进场 `--ease-out`（expo-out），退场 `--ease-in` | 进场「快起稳收」，退场「慢起加速离开」，符合直觉 |
+| 位移 | `--rise` 8px | 统一抬升距离，避免每个组件各写一套 |
+
+**只动 `transform` 与 `opacity`**：这台浏览器要跑在 Win7 + 无 GPU 加速的机器上，
+动 `width/height/top/left` 会触发整棵树重排，帧率会掉到个位数。
+唯一的例外是标签条的宽度动画 —— 那里必须让邻居跟着让位，用
+`flex-basis` + `flex-grow: 0` 精确控制，只影响同级 flex 项。
+
+系统开关「减少动态效果」时，`base.css` 末尾统一把所有动画压到 0.01ms，
+不是「关掉某个动画」，而是全部退化 —— 这类偏好应该由系统说了算。
+
+#### 交互细节
+
+| 位置 | 之前 | 现在 |
+| --- | --- | --- |
+| 标签页 | 创建/关闭瞬间出现、瞬间消失 | 创建从 0 宽度长出，关闭先收起再摘除；激活标签有顶部渐变高光 |
+| 发声标签 | 一个静态喇叭图标 | 三根跳动的竖条，能看出「还在响」 |
+| 标签条空白 | 无 | 双击新建标签页 |
+| 地址栏 | 聚焦只是变色 | 聚焦时轻微抬升 + 外发光；底部有真实推进的加载进度条 |
+| 地址补全 | 平铺列表 | 「建议 / 历史记录」分组；命中片段高亮；只在首次出现时播进场 |
+| 缩放 | 只能靠 Ctrl +/-，看不出当前比例 | 非 100% 时地址栏内出现缩放徽章，点击复位；按站点记忆 |
+| 新标签页 | 静态 | 光晕缓慢漂移、磁贴逐个落下、hover 抬升、拖拽排序、`/` 聚焦搜索 |
+| 下载 | 只能看进度 | 暂停 / 继续 / 取消 |
+| 菜单 / 对话框 | 直接消失 | 退场动画后再移除；菜单从点击点长出来 |
+
+#### 标签切换器
+
+`feature.tabswitch`（`Ctrl+Shift+A`）：
+
+- 排序用 **MRU**（最近使用优先）—— 切标签时想去的通常是「刚才那个」，不是「左边第 4 个」
+- 匹配用**子序列打分**：输入 `ghb` 也能命中 `GitHub`，连续命中权重更高
+- 默认选中第 2 项，Enter 就是「回到上一个标签」；`Del` 关闭选中项
+- 数据只来自 `nucleus.tabs` 的公开 API，没有新增任何特权通道
+
+#### 下载控制
+
+`DownloadService` 新增 `pause / resume / cancel`，但 **Electron 的 `DownloadItem`
+绝不进入 IPC**：它是不可克隆的原生对象，混进回传结构会让整条通道抛错。
+实现上用一张 `id → DownloadItem` 的私有表，`list()` 返回的仍是纯数据。
 
 ---
 
@@ -732,6 +785,7 @@ const THEME = {
 | `Ctrl+Shift+N` | 侧边便签 | feature.notes |
 | `Ctrl+Shift+Del` | 隐私清理 | feature.privacy |
 | `F1` | 快捷键速查 | feature.shortcuts |
+| `Ctrl+Shift+A` | 标签切换器 | feature.tabswitch |
 | `F11` | 切换全屏 | ui.window |
 
 快捷键在主进程用 `before-input-event` 匹配，所以焦点在网页里时同样有效。
@@ -844,7 +898,7 @@ nucleus/
 │   │   ├── lib/                tabs / commands / sidebar / ui / icons / nucleus
 │   │   ├── vendor/cordis.mjs   Cordis v4（esbuild 打包，零依赖）
 │   │   └── styles/             base（骨架）/ chrome（公共原子）/ widgets
-│   └── plugins/                21 个内置插件
+│   └── plugins/                22 个内置插件
 ├── docs/WINDOW-UI.md          窗口与界面的归属分析
 ├── profiles/                   配置层：default / desktop / minimal / kiosk
 ├── test-extensions/hello/      验证用的最小 Chrome 扩展
