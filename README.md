@@ -353,7 +353,7 @@ Nucleus.exe --profile=minimal --dump-config
 
 内置四个 profile：`desktop`（完整）、`minimal`（只有界面 + 设置）、
 `kiosk`（演示）、`default`（其余 profile 的底座）。
-实测 `--profile=minimal` 后禁用 17 个插件，快捷键从 37 条降到 18 条。
+实测 `--profile=minimal` 后禁用 17 个插件，快捷键从 38 条降到 19 条。
 
 ### 5.9 浏览器扩展
 
