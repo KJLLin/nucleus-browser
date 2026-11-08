@@ -4,6 +4,8 @@
 
 **版本 0.1.2-rc2** · 公开发布预览版，仍在开发中。
 
+[下载页](https://a202c1bff8161d227.app.workbuddy.host/?sharecode=T5ZVCT43R5) · [Releases](https://github.com/KJLLin/nucleus-browser/releases/tag/v0.1.2-rc2) · [窗口与界面的边界](docs/WINDOW-UI.md)
+
 Nucleus 用 Chromium 108 内核（Electron 22.3.27，**最后一个支持 Windows 7 的版本**）构建。
 插件树、可逆副作用、服务注册与依赖注入由 Cordis 负责；核只保留 Cordis 不提供的部分：
 清单校验、权限网关、`nucleus://` 协议、进程间桥接。
