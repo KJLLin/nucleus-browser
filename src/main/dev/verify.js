@@ -67,7 +67,25 @@ module.exports = async function verify({ win, app }) {
       out.prune = { seqBefore, removed, seqAfter: a.slots.entries.get(slotName).length };
     } else out.prune = { error: 'no-slot' };
 
-    // 5. 内核健康：结构完整，且槽位一项是「正常」
+    // 5. 动效开关：设置只挂属性，不逐帧干预
+    try {
+      const before = document.documentElement.dataset.motion;
+      await a.bridge.invoke('nucleus:settings:set', {
+        pluginId: 'core', key: 'plugin:ui.shell:reduceMotion', value: true,
+      });
+      await sleep(150);
+      const off = document.documentElement.dataset.motion;
+      await a.bridge.invoke('nucleus:settings:set', {
+        pluginId: 'core', key: 'plugin:ui.shell:reduceMotion', value: false,
+      });
+      await sleep(150);
+      const on = document.documentElement.dataset.motion;
+      out.motion = before + ' -> ' + off + ' -> ' + on;
+    } catch (e) {
+      out.motion = 'error: ' + e.message;
+    }
+
+    // 6. 内核健康：结构完整，且槽位一项是「正常」
     try {
       const h = await a.bridge.invoke('nucleus:doctor:run', { pluginId: 'core' });
       out.health = { ok: h.ok, checks: h.checks.length, slots: (h.checks.find((c) => c.id === 'slots') || {}).level };
@@ -82,6 +100,18 @@ module.exports = async function verify({ win, app }) {
     console.log('VERIFY ' + JSON.stringify(res, null, 1));
   } catch (err) {
     console.log('VERIFY_FAIL ' + err.message);
+  }
+
+  // 主进程 → 渲染层的事件通道：快捷键与总线广播都走这条链路。
+  // 之前 preload 多包了一层，payload 全变成 undefined，这里做一次端到端检查。
+  try {
+    const before = await win.webContents.executeJavaScript('window.__nucleusApp.tabs.order.length');
+    win.webContents.send('nucleus:run-command', { id: 'tabs.new', via: 'verify' });
+    await sleep(900);
+    const after = await win.webContents.executeJavaScript('window.__nucleusApp.tabs.order.length');
+    console.log('VERIFY_CMD ' + JSON.stringify({ before, after, grew: after > before }));
+  } catch (err) {
+    console.log('VERIFY_CMD ' + JSON.stringify({ error: err.message }));
   }
 
   // 主进程侧：沙箱模块加载的拒绝路径

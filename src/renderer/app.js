@@ -68,6 +68,16 @@ function applyBaseTheme(settings) {
 }
 
 /**
+ * 动效开关。
+ * 这里只是给 <html> 挂一个属性，真正「关掉」的是 motion.css 里的一条规则 ——
+ * 动画时长归样式表管，JS 不逐帧干预。
+ */
+function applyMotion(settings) {
+  const off = settings['plugin:ui.shell:reduceMotion'] === true;
+  document.documentElement.dataset.motion = off ? 'off' : 'on';
+}
+
+/**
  * 宿主只保证「有一个根空位」。
  *
  * 区域（tabstrip / nav-center / sidebar …）的声明权已经交给界面插件
@@ -246,6 +256,7 @@ async function boot() {
     allSettings = await bridge.invoke('nucleus:settings:all', { pluginId: 'core' });
   } catch (_) { /* ignore */ }
   applyBaseTheme(allSettings);
+  applyMotion(allSettings);
 
   const bus = new LocalBus();
   app.bus = bus;
@@ -311,7 +322,12 @@ async function boot() {
   for (const evt of ['activated', 'updated', 'created', 'removed', 'error']) {
     app.tabs.on(evt, () => app.slots.invalidate());
   }
-  bus.on('settings:changed', () => app.slots.invalidate());
+  bus.on('settings:changed', (payload) => {
+    app.slots.invalidate();
+    if (payload && payload.key === 'plugin:ui.shell:reduceMotion') {
+      document.documentElement.dataset.motion = payload.value === true ? 'off' : 'on';
+    }
+  });
 
   // 把槽位树推给主进程，自省页据此展示「界面是如何被组合出来的」
   let reportTimer = 0;

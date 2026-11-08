@@ -20,19 +20,28 @@ const EVENT_ALLOW = /^nucleus:[a-zA-Z0-9:_-]+$/;
 
 const listeners = new Map();
 
+/**
+ * 订阅主进程事件。
+ *
+ * 注意这里**不能再套一层 `(_event, payload) => handler(payload)`**：
+ * ipcRenderer 的回调已经剥掉了 IpcRendererEvent，再包一层会让 handler
+ * 收到的是事件的第一个参数（undefined），表现为「事件来了但数据全空」。
+ * 之前快捷键、总线广播、下载进度全部静默失效，就是这一行的问题。
+ */
 function on(channel, handler) {
   if (!EVENT_ALLOW.test(channel)) throw new Error(`非法 channel: ${channel}`);
-  const wrapped = (_event, payload) => handler(payload);
+  if (typeof handler !== 'function') throw new TypeError('handler 必须是函数');
   if (!listeners.has(channel)) {
-    listeners.set(channel, new Map());
+    listeners.set(channel, new Set());
     ipcRenderer.on(channel, (_e, payload) => {
       const set = listeners.get(channel);
-      for (const fn of Array.from(set.values())) {
+      if (!set) return;
+      for (const fn of Array.from(set)) {
         try { fn(payload); } catch (err) { console.error(`[bridge] ${channel} 处理异常`, err); }
       }
     });
   }
-  listeners.get(channel).set(handler, wrapped);
+  listeners.get(channel).add(handler);
   return () => {
     const set = listeners.get(channel);
     if (set) set.delete(handler);

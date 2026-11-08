@@ -206,6 +206,19 @@
   to { transform: translateX(220%); }
 }
 
+/* ---------- 全局「减少动画」 ----------
+   设置页的开关只给 <html> 挂 data-motion="off"，这里统一收口。
+   不用 display:none 之类的粗暴做法：元素仍在正确位置，只是不再过渡。 */
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
+}
+
 /* 骨架屏：比转圈更少闪烁，用于列表首帧 */
 .skeleton {
   position: relative;

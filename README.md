@@ -543,6 +543,59 @@ const bridge = window.__nucleusTakeBridge();
 绝不进入 IPC**：它是不可克隆的原生对象，混进回传结构会让整条通道抛错。
 实现上用一张 `id → DownloadItem` 的私有表，`list()` 返回的仍是纯数据。
 
+
+### 5.12 修复：主进程事件全部丢失（rc2）
+
+这一版最重要的改动不是新功能，是一个**从早期版本就存在、且完全没有报错**的缺陷。
+
+#### 现象
+
+| 表现 | 用户感知 |
+| --- | --- |
+| 所有快捷键不响应 | 按 `Ctrl+T` 没反应，只能点加号 |
+| 广告拦截计数永远为 0 | 状态栏那个数字像装饰 |
+| 下载面板不实时更新 | 只能等完成后的提示 |
+| 设置改动不触发界面重绘 | 部分槽位条件不刷新 |
+
+#### 根因
+
+`chrome-preload.js` 的事件订阅多包了一层：
+
+```js
+// 错：ipcRenderer 回调已经只给 payload，再包一层就错位了
+const wrapped = (_event, payload) => handler(payload);
+
+ipcRenderer.on(channel, (_e, payload) => {
+  for (const fn of Array.from(set.values())) fn(payload); // fn 收到的 payload 变成了 _event
+});
+```
+
+于是 `nucleus:run-command` 的 handler 收到 `undefined`，解构直接抛错被上层吞掉；
+`nucleus:bus` 的 handler 判断 `if (msg)` 后静默返回。整条链路**没有任何日志**。
+
+#### 修复
+
+```js
+// 对：直接把 handler 存进 Set，payload 原样传下去
+listeners.set(channel, new Set());
+ipcRenderer.on(channel, (_e, payload) => {
+  for (const fn of Array.from(listeners.get(channel))) fn(payload);
+});
+```
+
+#### 回归
+
+`NUCLEUS_VERIFY=1` 现在覆盖两条端到端链路：
+
+```
+VERIFY_CMD {"before":1,"after":2,"grew":true}   # 主进程派发 tabs.new，标签真的多了一个
+"motion": "on -> off -> on"                      # 设置变更经总线到达渲染层并生效
+```
+
+> 诚实说明：之前所有关于「快捷键可用」的验证，都是在渲染层直接调用
+> `commands.execute()`，恰好绕开了这条链路。这就是为什么它能藏这么久 ——
+> **测试绕过的路径，等于没测**。
+
 ---
 
 ## 六、插件开发

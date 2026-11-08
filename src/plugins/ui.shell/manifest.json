@@ -130,6 +130,18 @@
     ],
     "settings": [
       {
+        "section": "外观与动效",
+        "items": [
+          {
+            "key": "reduceMotion",
+            "label": "减少动画",
+            "type": "boolean",
+            "default": false,
+            "description": "关闭标签进出场、菜单与对话框的过渡。系统已开启「减少动态效果」时会自动生效。"
+          }
+        ]
+      },
+      {
         "section": "标签栏",
         "items": [
           {

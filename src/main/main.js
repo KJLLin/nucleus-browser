@@ -189,6 +189,7 @@ async function buildServices() {
 
   // 把主进程事件镜像到渲染层
   bus.setBridge((event, payload) => {
+    if (process.env.NUCLEUS_BUS_DEBUG === '1') console.log('BUS_BRIDGE', event, !!windows.win);
     if (!windows.win || windows.win.isDestroyed()) return;
     windows.win.webContents.send('nucleus:bus', { event, payload });
   });

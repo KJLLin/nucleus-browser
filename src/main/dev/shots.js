@@ -68,6 +68,9 @@ module.exports = async function capture({ win, plugins, app }) {
   await run('newtab-dark', async () => {
     await command('theme.dark');
     await sleep(500);
+    // 插件刚激活时可能留下提示条，截图里不该有它
+    await ui(`document.getElementById('toasts')?.replaceChildren()`);
+    await sleep(200);
     await shot('01-newtab-dark');
   });
 
