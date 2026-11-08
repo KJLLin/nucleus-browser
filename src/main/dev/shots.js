@@ -19,6 +19,10 @@ module.exports = async function capture({ win, plugins, app }) {
 
   const shot = async (name) => {
     try {
+      // 场景之间会残留提示条（扩展注入、模式切换…）。截图要展示界面本身，
+      // 不是「刚才发生了什么」，所以统一先清干净。
+      await ui(`document.getElementById('toasts')?.replaceChildren()`).catch(() => {});
+      await sleep(120);
       const img = await win.webContents.capturePage();
       fs.writeFileSync(`${OUT}/${name}.png`, img.toPNG());
       console.log('SHOT ' + name);
