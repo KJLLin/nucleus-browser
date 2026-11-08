@@ -1,0 +1,33 @@
+# 桌面完整形态：所有内置插件都开着
+#
+# 这是默认 profile。它不改变任何插件的状态，只是把「完整形态」
+# 明确写出来 —— profile 的价值在于「可被别的形态替换」，而不是这串列表本身。
+
+plugins:
+  enable:
+    - ui.shell
+    - ui.window
+    - feature.bookmarks
+    - feature.history
+    - feature.downloads
+    - feature.find
+    - feature.reader
+    - feature.screenshot
+    - feature.adblock
+    - feature.palette
+    - feature.settings
+    - feature.session
+    - feature.contextmenu
+    - feature.devtools
+    - theme.nucleus
+    - feature.inspector
+    - feature.extensions
+    - feature.tabsleep
+    - feature.notes
+    - feature.shortcuts
+    - feature.privacy
+  disable: []
+
+settings:
+  "appearance.theme": auto
+  "plugin:ui.shell:showSuggestions": true

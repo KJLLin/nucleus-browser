@@ -1,0 +1,14 @@
+{
+  "id": "feature.screenshot",
+  "name": "网页截图",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "截取当前标签页的可视区域，支持保存为 PNG 或复制到剪贴板。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "commands", "clipboard"],
+  "contributes": {
+    "commands": [
+      { "id": "screenshot.capture", "title": "截取当前页面", "icon": "camera", "keybinding": "Ctrl+Shift+S" }
+    ]
+  }
+}

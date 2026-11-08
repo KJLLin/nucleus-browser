@@ -1,0 +1,18 @@
+{
+  "id": "feature.extensions",
+  "name": "浏览器扩展",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "加载 Chrome 扩展的一个可用子集：内容脚本、popup、options、MV2 后台页与消息路由。不支持的能力会在管理页逐项列出。",
+  "main": "main.js",
+  "ui": "ui.js",
+  "permissions": ["plugins", "tabs", "commands", "dialog"],
+  "contributes": {
+    "commands": [
+      { "id": "extensions.open", "title": "管理浏览器扩展", "icon": "puzzle", "keybinding": "Ctrl+Shift+E" }
+    ],
+    "toolbar": [
+      { "id": "extensions.btn", "icon": "puzzle", "title": "扩展", "region": "nav-right", "order": 80, "command": "extensions.open" }
+    ]
+  }
+}

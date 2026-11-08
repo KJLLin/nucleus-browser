@@ -1,0 +1,16 @@
+{
+  "id": "feature.privacy",
+  "name": "隐私清理",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "一键清除缓存与站点数据，并记录上次清理时间。作用范围是浏览器自己的会话，不碰系统其它内容。",
+  "ui": "ui.js",
+  "styles": ["privacy.css"],
+  "permissions": ["session", "commands", "settings", "storage"],
+  "contributes": {
+    "commands": [
+      { "id": "privacy.panel", "title": "隐私清理", "icon": "shield", "keybinding": "Ctrl+Shift+Del" },
+      { "id": "privacy.cache", "title": "只清除缓存", "icon": "trash", "hidden": true }
+    ]
+  }
+}

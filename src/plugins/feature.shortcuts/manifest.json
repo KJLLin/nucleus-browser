@@ -1,0 +1,15 @@
+{
+  "id": "feature.shortcuts",
+  "name": "快捷键速查",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "一眼看全所有命令与当前生效的快捷键，按来源插件分组。",
+  "ui": "ui.js",
+  "styles": ["shortcuts.css"],
+  "permissions": ["commands"],
+  "contributes": {
+    "commands": [
+      { "id": "shortcuts.help", "title": "快捷键速查表", "icon": "command", "keybinding": "F1" }
+    ]
+  }
+}

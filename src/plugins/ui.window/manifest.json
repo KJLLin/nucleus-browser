@@ -1,0 +1,29 @@
+{
+  "id": "ui.window",
+  "name": "窗口控制",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "标题栏右侧的最小化 / 最大化 / 关闭按钮，以及双击标题栏、F11 全屏。窗口本身由宿主创建，按钮语义由这个插件负责。",
+  "ui": "ui.js",
+  "styles": ["window.css"],
+  "permissions": ["window", "commands", "settings"],
+  "required": true,
+  "contributes": {
+    "slots": ["region.wincontrols"],
+    "commands": [
+      { "id": "window.minimize", "title": "最小化窗口", "icon": "minus", "hidden": true },
+      { "id": "window.maximize", "title": "最大化 / 还原窗口", "icon": "maximize-2", "hidden": true },
+      { "id": "window.close", "title": "关闭窗口", "icon": "x", "hidden": true },
+      { "id": "window.fullscreen", "title": "切换全屏", "icon": "maximize-2", "keybinding": "F11" }
+    ],
+    "settings": [
+      {
+        "section": "窗口",
+        "items": [
+          { "key": "doubleClickMaximize", "label": "双击标题栏最大化", "type": "boolean", "default": true },
+          { "key": "showBrand", "label": "标题栏显示品牌标识", "type": "boolean", "default": true }
+        ]
+      }
+    ]
+  }
+}

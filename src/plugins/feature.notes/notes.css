@@ -1,0 +1,86 @@
+.notes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.notes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.notes-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+.notes-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.notes-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.notes-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.notes-textarea {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  resize: none;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--bg-input);
+  color: var(--text);
+  font: 13px/1.7 var(--font);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 140ms var(--ease);
+}
+
+.notes-textarea:focus {
+  border-color: var(--accent);
+}
+
+.notes-textarea.mono {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+.notes-status {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-faint);
+  padding: 0 2px 2px;
+  user-select: none;
+}

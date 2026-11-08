@@ -1,0 +1,14 @@
+{
+  "id": "feature.reader",
+  "name": "阅读模式",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "提取网页正文，去掉导航、广告和侧栏，用统一的排版重新呈现。纯前端实现，不上传任何内容。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "reader.toggle", "title": "切换阅读模式", "icon": "book-open", "keybinding": "Ctrl+Alt+R" }
+    ]
+  }
+}

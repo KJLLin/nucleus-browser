@@ -1,0 +1,15 @@
+{
+  "id": "feature.contextmenu",
+  "name": "右键菜单",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "网页右键菜单：链接、图片、选中文本、输入框各有对应的操作项。禁用后网页右键将没有任何菜单。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "commands", "clipboard"],
+  "contributes": {
+    "commands": [
+      { "id": "contextmenu.copy", "title": "复制", "hidden": true },
+      { "id": "contextmenu.paste", "title": "粘贴", "hidden": true }
+    ]
+  }
+}

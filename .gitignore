@@ -1,0 +1,16 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.cache/
+*.log
+
+# 打包/运行产生的临时文件
+core.*
+/tmp/
+screenshots/tmp/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

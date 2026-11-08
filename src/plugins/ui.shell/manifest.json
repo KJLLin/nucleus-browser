@@ -1,0 +1,219 @@
+{
+  "id": "ui.shell",
+  "name": "浏览器界面",
+  "version": "3.0.0",
+  "author": "Nucleus",
+  "description": "标签栏 + 导航工具栏 + 智能地址栏 + 新标签页，并声明整套界面区域。禁用后浏览器将只剩一块空白的网页区域。",
+  "ui": "ui.js",
+  "styles": [
+    "styles.css"
+  ],
+  "permissions": [
+    "tabs",
+    "commands",
+    "settings"
+  ],
+  "contributes": {
+    "newTab": {
+      "url": "nucleus://ui.shell/newtab/index.html"
+    },
+    "commands": [
+      {
+        "id": "tabs.new",
+        "title": "新建标签页",
+        "icon": "plus",
+        "keybinding": "Ctrl+T"
+      },
+      {
+        "id": "tabs.close",
+        "title": "关闭当前标签页",
+        "icon": "x",
+        "keybinding": "Ctrl+W"
+      },
+      {
+        "id": "tabs.reopen",
+        "title": "重新打开已关闭的标签页",
+        "icon": "rotate-cw",
+        "keybinding": "Ctrl+Shift+T"
+      },
+      {
+        "id": "tabs.next",
+        "title": "切换到下一个标签页",
+        "icon": "chevron-right",
+        "keybinding": "Ctrl+Tab"
+      },
+      {
+        "id": "tabs.prev",
+        "title": "切换到上一个标签页",
+        "icon": "chevron-left",
+        "keybinding": "Ctrl+Shift+Tab"
+      },
+      {
+        "id": "tabs.duplicate",
+        "title": "复制当前标签页",
+        "icon": "copy",
+        "keybinding": "Ctrl+Shift+D"
+      },
+      {
+        "id": "tabs.closeOthers",
+        "title": "关闭其他标签页",
+        "icon": "layers",
+        "hidden": true
+      },
+      {
+        "id": "tabs.closeRight",
+        "title": "关闭右侧标签页",
+        "icon": "panel-right",
+        "hidden": true
+      },
+      {
+        "id": "nav.back",
+        "title": "后退",
+        "icon": "arrow-left",
+        "keybinding": "Alt+Left"
+      },
+      {
+        "id": "nav.forward",
+        "title": "前进",
+        "icon": "arrow-right",
+        "keybinding": "Alt+Right"
+      },
+      {
+        "id": "nav.reload",
+        "title": "重新加载",
+        "icon": "rotate-cw",
+        "keybinding": "F5"
+      },
+      {
+        "id": "nav.hardReload",
+        "title": "忽略缓存重新加载",
+        "icon": "rotate-cw",
+        "keybinding": "Ctrl+Shift+R"
+      },
+      {
+        "id": "nav.stop",
+        "title": "停止加载",
+        "icon": "x",
+        "keybinding": "Esc",
+        "hidden": true
+      },
+      {
+        "id": "nav.home",
+        "title": "打开新标签页",
+        "icon": "home",
+        "keybinding": "Alt+Home"
+      },
+      {
+        "id": "nav.focus",
+        "title": "聚焦地址栏",
+        "icon": "search",
+        "keybinding": "Ctrl+L"
+      },
+      {
+        "id": "zoom.in",
+        "title": "放大页面",
+        "icon": "zoom-in",
+        "keybinding": "Ctrl+="
+      },
+      {
+        "id": "zoom.out",
+        "title": "缩小页面",
+        "icon": "zoom-out",
+        "keybinding": "Ctrl+-"
+      },
+      {
+        "id": "zoom.reset",
+        "title": "恢复默认缩放",
+        "icon": "maximize-2",
+        "keybinding": "Ctrl+0"
+      }
+    ],
+    "settings": [
+      {
+        "section": "标签栏",
+        "items": [
+          {
+            "key": "closeButton",
+            "label": "显示标签关闭按钮",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "maxWidth",
+            "label": "单个标签最大宽度",
+            "type": "range",
+            "min": 120,
+            "max": 320,
+            "step": 10,
+            "default": 210,
+            "description": "单位像素。窗口较窄时标签会自动收紧。"
+          },
+          {
+            "key": "rememberClosed",
+            "label": "记住最近关闭的标签数量",
+            "type": "range",
+            "min": 0,
+            "max": 50,
+            "step": 5,
+            "default": 20,
+            "description": "用于 Ctrl+Shift+T 逐个恢复。设为 0 表示不记录。"
+          }
+        ]
+      },
+      {
+        "section": "地址栏",
+        "items": [
+          {
+            "key": "searchEngine",
+            "label": "默认搜索引擎",
+            "type": "select",
+            "default": "bing",
+            "options": [
+              {
+                "value": "bing",
+                "label": "Bing"
+              },
+              {
+                "value": "baidu",
+                "label": "百度"
+              },
+              {
+                "value": "google",
+                "label": "Google"
+              },
+              {
+                "value": "ddg",
+                "label": "DuckDuckGo"
+              }
+            ]
+          },
+          {
+            "key": "showSuggestions",
+            "label": "显示地址栏补全",
+            "type": "boolean",
+            "default": true,
+            "description": "输入时下拉显示历史记录与搜索建议。"
+          },
+          {
+            "key": "openInNewTab",
+            "label": "搜索时在新标签页打开",
+            "type": "boolean",
+            "default": false
+          }
+        ]
+      }
+    ],
+    "slots": [
+      "region.wincontrols",
+      "region.tabstrip",
+      "region.nav-left",
+      "region.nav-center",
+      "region.nav-right",
+      "region.sidebar",
+      "region.statusbar",
+      "region.overlay",
+      "shell.statusbar.items"
+    ]
+  },
+  "required": true
+}

@@ -1,0 +1,71 @@
+Nucleus 浏览器 0.1.1-rc1
+=======================
+
+这是第一个公开发布的预览版，仍在开发中。
+完整说明见 source/README.md 与 source/docs/WINDOW-UI.md。
+
+【怎么用】
+1. 把整个 Nucleus 文件夹解压到磁盘任意位置（不要放在需要管理员权限的目录）。
+2. 双击 Nucleus\Nucleus.exe。
+
+绿色版：卸载时直接删掉文件夹即可。
+配置文件在 C:\Users\你的用户名\AppData\Roaming\Nucleus，如需彻底清除请一并删除。
+
+【系统要求】
+Windows 7 SP1 / 8 / 8.1 / 10 / 11，64 位。
+Windows 7 需要先安装 SHA-2 更新（KB4474419）和 KB2533623，否则程序无法启动。
+这是 Chromium 内核本身的要求，与浏览器无关。
+
+【首次打开可能提示"未知发布者"】
+本程序未做数字签名。点击"更多信息"→"仍要运行"即可。
+
+【配置形态】
+Nucleus.exe --profile=minimal      最小形态（只留界面与设置）
+Nucleus.exe --profile=kiosk        演示形态（无干扰）
+Nucleus.exe --list-profiles        看有哪些形态
+Nucleus.exe --dump-config          看三层配置叠加后的结果
+用户自己的覆盖写在 %APPDATA%\Nucleus\nucleus.patch.yml
+
+【这一版有什么】
+- 界面区域由 ui.shell 插件声明，窗口按钮由 ui.window 插件负责，核不再画界面
+- 标签休眠：后台标签超时释放渲染进程，切回时自动重建
+- 侧边便签 / 快捷键速查 / 隐私清理
+- 内核健康检查（自省页第六个视图），可一键回收泄漏
+- 插件模块走受限 require，插件管理通道需要 plugins 权限
+
+【浏览器扩展】
+Ctrl+Shift+E 打开扩展管理，点「安装扩展」选一个含 manifest.json 的文件夹。
+支持内容脚本、popup、选项页、MV2 后台页；MV3 Service Worker 与网络拦截不支持，
+管理页会逐个扩展标出它用到了哪些不支持的能力。
+
+【常用快捷键】
+Ctrl+T 新建标签      Ctrl+W 关闭标签      Ctrl+Shift+T 恢复关闭的标签
+Ctrl+L 定位地址栏    Ctrl+D 收藏          Ctrl+H 历史记录
+Ctrl+J 下载          Ctrl+F 页内查找      Ctrl+K 命令面板
+Ctrl+, 设置          F12 开发者工具       Ctrl+Shift+L 切换深浅色
+Ctrl+Alt+I 运行时自省  Ctrl+Shift+E 扩展管理
+
+【遇到问题】
+- 界面花屏 / 黑块：给 Nucleus.exe 建快捷方式，在"目标"末尾加空格和 --nucleus-gpu-off
+- 窗口边缘无法拖动调整大小：设置 → 通用 → 关闭"无边距自绘窗口"，重启
+- 界面整个消失了：说明界面插件被禁用了。浏览器会自动弹出一条恢复提示，
+  点一下就能装回来；没弹出的话，执行 Ctrl+K 打开命令面板，搜索"界面"重新启用。
+- 想从头再来：删除 AppData\Roaming\Nucleus 整个目录
+
+【这是什么】
+一个"一切皆插件"的浏览器，底座是 Cordis（和 DeepSeek Harness 同一个插件内核）。
+插件树、副作用回收、服务注册与依赖注入都由 Cordis 负责；
+核只保留它不提供的部分：清单校验、权限网关、内部协议、进程间桥接。
+标签栏、地址栏、新标签页由同一个插件（ui.shell）提供；书签、历史、下载、
+广告拦截、主题、命令面板、设置页，全部都是可以单独关掉的插件。
+关掉 ui.shell，浏览器就只剩一块空白的网页区域 —— 这就是"没有特权内核"的样子。
+按 Ctrl+K 可以看到当前所有命令。
+
+插件禁用时，它注册过的监听、命令、网络规则、定时器会被 Cordis 逐一回收，
+不会留下还在后台跑的孤儿代码。主进程和界面各有一棵插件树，中间靠 RPC 桥接 ——
+这也是 DeepSeek Harness 的形态：Cordis 的上下文是进程内对象，服务跨不过进程。
+
+Cordis 本体已打包进 source/src/renderer/vendor/cordis.mjs（58 KB，零依赖），
+不需要联网、不需要 npm。
+
+深入说明见 Nucleus\README.md，源码在 source\ 目录。

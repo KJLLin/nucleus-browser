@@ -1,0 +1,46 @@
+{
+  "id": "theme.nucleus",
+  "name": "主题与外观",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "提供深色 / 浅色 / 跟随系统三套外观。主题在 Nucleus 里也只是一个插件 —— 因为整个界面都由 CSS 变量驱动。",
+  "ui": "ui.js",
+  "permissions": ["settings", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "theme.toggle", "title": "在深色与浅色之间切换", "icon": "moon", "keybinding": "Ctrl+Shift+L" },
+      { "id": "theme.dark", "title": "切换到深色主题", "icon": "moon", "hidden": true },
+      { "id": "theme.light", "title": "切换到浅色主题", "icon": "sun", "hidden": true },
+      { "id": "theme.auto", "title": "跟随系统外观", "icon": "monitor", "hidden": true }
+    ],
+    "settings": [
+      {
+        "section": "外观",
+        "items": [
+          {
+            "key": "mode",
+            "label": "主题",
+            "type": "select",
+            "default": "auto",
+            "options": [
+              { "value": "auto", "label": "跟随系统" },
+              { "value": "dark", "label": "深色" },
+              { "value": "light", "label": "浅色" }
+            ]
+          },
+          {
+            "key": "density",
+            "label": "界面密度",
+            "type": "select",
+            "default": "comfortable",
+            "options": [
+              { "value": "compact", "label": "紧凑" },
+              { "value": "comfortable", "label": "标准" },
+              { "value": "spacious", "label": "宽松" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

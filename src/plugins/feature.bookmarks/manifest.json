@@ -1,0 +1,59 @@
+{
+  "id": "feature.bookmarks",
+  "name": "书签",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "收藏当前页面，在侧边栏里检索与管理书签。工具栏星标、快捷键、侧边栏面板都来自这一个插件。",
+  "ui": "ui.js",
+  "permissions": [
+    "tabs",
+    "commands",
+    "storage",
+    "settings",
+    "clipboard"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "bookmarks.toggle",
+        "title": "收藏 / 取消收藏当前页面",
+        "icon": "star",
+        "keybinding": "Ctrl+D"
+      },
+      {
+        "id": "bookmarks.panel",
+        "title": "打开书签面板",
+        "icon": "panel-left",
+        "keybinding": "Ctrl+Shift+O"
+      },
+      {
+        "id": "bookmarks.manage",
+        "title": "管理全部书签",
+        "icon": "bookmark",
+        "hidden": true
+      }
+    ],
+    "settings": [
+      {
+        "section": "书签",
+        "items": [
+          {
+            "key": "showStar",
+            "label": "在工具栏显示星标按钮",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "openInNewTab",
+            "label": "点击书签时在新标签页打开",
+            "type": "boolean",
+            "default": false
+          }
+        ]
+      }
+    ],
+    "slots": [
+      "shell.omnibox.actions"
+    ]
+  }
+}

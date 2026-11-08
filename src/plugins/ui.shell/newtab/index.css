@@ -1,0 +1,273 @@
+/* 新标签页：独立于浏览器外壳的视觉，但仍然属于同一个产品 */
+
+:root {
+  --bg: #101216;
+  --bg-soft: #16191f;
+  --text: #eef1f7;
+  --text-dim: #9aa3b3;
+  --text-faint: #666f7f;
+  --line: rgba(255, 255, 255, 0.07);
+  --accent: #5b8cff;
+  --accent-2: #8b6cff;
+  --card: rgba(255, 255, 255, 0.045);
+  --card-hover: rgba(255, 255, 255, 0.085);
+  --accent-line: rgba(91, 140, 255, 0.55);
+  --line-strong: rgba(255, 255, 255, 0.22);
+}
+
+/* 主题由核的 web-preload 写在 <html data-theme> 上 */
+:root[data-theme="light"] {
+  --bg: #f5f6f9;
+  --bg-soft: #ffffff;
+  --text: #1a1d24;
+  --text-dim: #5c6472;
+  --text-faint: #8b93a3;
+  --line: rgba(0, 0, 0, 0.1);
+  --card: rgba(255, 255, 255, 0.92);
+  --card-hover: #ffffff;
+  --accent-line: rgba(70, 120, 240, 0.6);
+  --line-strong: rgba(0, 0, 0, 0.22);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", -apple-system, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* 背景：两团柔光 + 细网格，避免纯色flat */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  background:
+    radial-gradient(46% 42% at 22% 12%, rgba(91, 140, 255, 0.16), transparent 70%),
+    radial-gradient(40% 38% at 82% 8%, rgba(139, 108, 255, 0.13), transparent 72%);
+  pointer-events: none;
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 62% 52% at 50% 34%, #000 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 52% at 50% 34%, #000 30%, transparent 100%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  /* 视觉重心略高于几何中心 */
+  padding-bottom: 6vh;
+}
+
+/* ---------- 时钟 ---------- */
+
+.hero { text-align: center; }
+
+.clock .time {
+  font-size: 60px;
+  font-weight: 200;
+  letter-spacing: 2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, var(--text), var(--text-dim));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.clock .date {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.6px;
+}
+
+.greeting {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+/* ---------- 搜索 ---------- */
+
+.search {
+  width: min(560px, 100%);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.search:hover { background: var(--card-hover); }
+
+.search:focus-within {
+  background: var(--bg-soft);
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 4px rgba(91, 140, 255, 0.13), 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.search .s-icon { color: var(--text-faint); display: flex; flex: 0 0 auto; }
+.search:focus-within .s-icon { color: var(--accent); }
+
+.search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  user-select: text;
+  cursor: text;
+}
+.search input::placeholder { color: var(--text-faint); }
+
+.engine {
+  flex: 0 0 auto;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-dim);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.engine:hover { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+
+/* ---------- 快捷方式 ---------- */
+
+.shortcuts {
+  width: min(600px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 10px;
+}
+
+.sc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 86px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
+}
+
+.sc:hover {
+  background: var(--card-hover);
+  border-color: var(--line);
+  transform: translateY(-2px);
+}
+
+.sc .avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.sc .label {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sc .del {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  display: none;
+  cursor: pointer;
+  padding: 0;
+}
+.sc:hover .del { display: block; }
+
+/* ---------- 添加 ---------- */
+
+.add {
+  border: 1px dashed var(--line-strong);
+  background: none;
+  color: var(--text-faint);
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 15px;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.add:hover { color: var(--text-dim); border-color: var(--text-faint); }
+
+/* ---------- 页脚 ---------- */
+
+.foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  letter-spacing: 0.4px;
+  z-index: 1;
+}
+.foot .dot { margin: 0 6px; opacity: 0.5; }
+.foot #brand { color: var(--text-dim); font-weight: 600; letter-spacing: 1px; }
+.foot .motto { color: var(--accent); opacity: 0.8; }
+
+@media (max-height: 620px) {
+  .wrap { gap: 16px; padding-bottom: 0; }
+  .clock .time { font-size: 44px; }
+  .sc { height: 70px; }
+}

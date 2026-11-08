@@ -1,0 +1,14 @@
+# Nucleus 默认形态
+#
+# 这一层是「产品默认」，用户配置在 %APPDATA%/Nucleus/nucleus.patch.yml，
+# 两者叠加后才是真正运行的插件树。用 --dump-config 可以看叠加结果。
+
+defaultProfile: desktop
+
+plugins:
+  # 空数组表示「不额外启用 / 不额外禁用」，全部按插件目录里的默认状态
+  enable: []
+  disable: []
+
+settings:
+  "appearance.theme": auto

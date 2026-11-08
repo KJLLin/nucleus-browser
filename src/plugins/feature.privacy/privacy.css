@@ -1,0 +1,78 @@
+.pv-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pv-lead {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  padding: 2px 0 4px;
+}
+
+.pv-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--bg-chrome);
+}
+
+.pv-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.pv-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pv-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pv-desc {
+  margin-top: 2px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+.pv-done {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ok);
+}
+
+.pv-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.pv-last {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}

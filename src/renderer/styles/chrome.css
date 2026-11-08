@@ -1,0 +1,150 @@
+/* ==========================================================================
+   Nucleus · 外壳骨架 + 跨插件复用的工具栏原子
+   这里只保留「所有插件都可能用到」的东西：
+     - 工具栏圆形按钮 .navbtn（书签星标、下载、拦截、设置都用它）
+     - 侧边栏面板容器 .panel
+     - 页面加载失败覆盖层 .tab-error
+
+   标签页、地址栏、补全下拉等具体组件样式属于 ui.shell 插件，
+   见 src/plugins/ui.shell/styles.css —— 它们不再住在核里。
+   ========================================================================== */
+
+/* ---------- 工具栏按钮（跨插件原子） ---------- */
+
+.navbtn {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-s);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  flex: 0 0 auto;
+  transition: background 120ms linear, color 120ms linear;
+}
+.navbtn svg { width: 16px; height: 16px; }
+.navbtn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
+.navbtn:active:not(:disabled) { background: var(--bg-active); }
+.navbtn:disabled { opacity: 0.28; }
+.navbtn.on { color: var(--accent); background: var(--accent-soft); }
+
+.navbtn .badge {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* ---------- 侧边栏面板容器 ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.panel-head {
+  height: 38px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.panel-head .grow { flex: 1 1 auto; }
+.panel-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ---------- 页面加载失败覆盖层 ---------- */
+
+.tab-error {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tab-error-inner {
+  max-width: 460px;
+  padding: 28px;
+  text-align: center;
+}
+
+.tab-error .te-code {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.tab-error .te-desc {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.tab-error .te-url {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  max-width: 100%;
+  margin-bottom: 18px;
+}
+
+/* ---------- 引导恢复条 ----------
+   只在「一个界面插件都没启用」时出现，属于核的引导职责，不属于外观。 */
+
+.shell-recovery {
+  position: fixed;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  z-index: 500;
+  width: min(560px, calc(100vw - 64px));
+  padding: 20px 22px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-2);
+}
+
+.shell-recovery .sr-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.shell-recovery .sr-desc {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.shell-recovery .sr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}

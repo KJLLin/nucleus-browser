@@ -1,0 +1,266 @@
+/* ==========================================================================
+   Nucleus · 基础层
+   变量即主题接口：任何主题插件只需要覆盖这些自定义属性。
+   刻意不使用 backdrop-filter —— Win7 的 D3D 合成下它会让整窗掉帧。
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #14161a;
+  --bg-chrome: #1b1e24;
+  --bg-elev: #232830;
+  --bg-input: #22262e;
+  --bg-hover: #2c313b;
+  --bg-active: #353b47;
+  --border: #2c313b;
+  --border-strong: #3c433f;
+  --border-soft: #24282f;
+
+  --text: #e8ebf1;
+  --text-dim: #99a2b2;
+  --text-faint: #6b7484;
+
+  --accent: #5b8cff;
+  --accent-hover: #7aa2ff;
+  --accent-soft: rgba(91, 140, 255, 0.15);
+  --danger: #ff5f57;
+  --warn: #f0b232;
+  --ok: #3ecf8e;
+
+  --topbar-h: 40px;
+  --toolbar-h: 46px;
+  --statusbar-h: 0px;
+
+  --radius-s: 6px;
+  --radius-m: 9px;
+  --radius-l: 13px;
+
+  --shadow-1: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 16px 48px rgba(0, 0, 0, 0.55);
+
+  --font: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", -apple-system,
+          "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --mono: Consolas, "Courier New", monospace;
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; padding: 0; }
+a { color: var(--accent); text-decoration: none; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #3a4049;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: #4a515d; background-clip: content-box; }
+
+/* ---------- 骨架 ---------- */
+
+#shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-chrome);
+}
+
+#topbar {
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 0 0 10px;
+  flex: 0 0 auto;
+  -webkit-app-region: drag;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.brand {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex: 0 0 auto;
+  opacity: 0.9;
+}
+
+/* 标签条由插件填充，但拖拽语义归核：空白处可拖动窗口 */
+.tabstrip {
+  flex: 1 1 auto;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  -webkit-app-region: drag;
+  overflow: hidden;
+}
+
+.wincontrols {
+  display: flex;
+  height: 100%;
+  flex: 0 0 auto;
+  -webkit-app-region: no-drag;
+}
+
+.wincontrols .wc {
+  width: 46px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  transition: background 120ms linear, color 120ms linear;
+}
+.wincontrols .wc svg { width: 10px; height: 10px; }
+.wincontrols .wc:hover { background: var(--bg-hover); color: var(--text); }
+.wincontrols .wc.close:hover { background: #e81123; color: #fff; }
+
+#toolbar {
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  -webkit-app-region: no-drag;
+}
+
+.nav-center {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+#content {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+
+#webarea {
+  flex: 1 1 auto;
+  position: relative;
+  min-width: 0;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+#webarea webview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+  z-index: 0;
+  visibility: hidden;
+}
+#webarea webview.active { visibility: visible; z-index: 1; }
+
+.sidebar {
+  flex: 0 0 auto;
+  width: 300px;
+  background: var(--bg-chrome);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar[data-side="right"] {
+  border-right: none;
+  border-left: 1px solid var(--border);
+  order: 2;
+}
+.sidebar[hidden] { display: none; }
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+}
+#overlay > * { pointer-events: auto; }
+
+#toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* 状态栏是悬浮胶囊，不占网页高度 —— 它承载的是「看一眼就走」的信息 */
+#statusbar {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  height: 24px;
+  width: auto;
+  max-width: 60vw;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-1);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: none;
+  align-items: center;
+  padding: 0 10px;
+  z-index: 800;
+  pointer-events: auto;
+}
+#statusbar.has-content { display: flex; }
+
+/* 全屏时隐藏 chrome，只留网页 */
+body.fullscreened #topbar,
+body.fullscreened #toolbar,
+body.fullscreened .sidebar { display: none; }
+
+.fade-in { animation: fadeIn 160ms var(--ease); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,21 @@
+/* 窗口控制组：容器由宿主的标题栏提供，这里只调细节 */
+
+.wincontrols {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+
+.wincontrols .wc {
+  width: 44px;
+  height: 100%;
+  min-height: 30px;
+}
+
+/* 拖拽区域：标题栏空白处可以拖动窗口（宿主的 -webkit-app-region 不在 CSS 里，
+   而是由 .titlebar-drag 控制；这里补上按钮区不可拖拽） */
+.wincontrols .wc {
+  -webkit-app-region: no-drag;
+}

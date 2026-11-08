@@ -1,0 +1,26 @@
+{
+  "id": "feature.history",
+  "name": "历史记录",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "自动记录访问过的网页，提供按日期浏览的历史面板，并向地址栏提供补全建议。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "commands", "storage", "settings"],
+  "contributes": {
+    "commands": [
+      { "id": "history.panel", "title": "打开历史记录", "icon": "clock", "keybinding": "Ctrl+H" },
+      { "id": "history.clear", "title": "清空历史记录", "icon": "trash", "hidden": true },
+      { "id": "history.suggest", "title": "历史补全（内部）", "hidden": true }
+    ],
+    "settings": [
+      {
+        "section": "历史记录",
+        "items": [
+          { "key": "enabled", "label": "记录浏览历史", "type": "boolean", "default": true },
+          { "key": "maxEntries", "label": "最多保留条数", "type": "range", "min": 100, "max": 5000, "step": 100, "default": 2000 },
+          { "key": "excludeInternal", "label": "不记录浏览器内部页面", "type": "boolean", "default": true }
+        ]
+      }
+    ]
+  }
+}

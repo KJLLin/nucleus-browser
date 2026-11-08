@@ -1,0 +1,32 @@
+# 最小形态：只保留「能上网 + 能设置」的最小集
+#
+# 用途：验证「关掉一半插件，浏览器仍然可用」。
+# 启动方式：Nucleus.exe --profile=minimal
+
+plugins:
+  enable:
+    - ui.shell
+    - ui.window
+    - feature.settings
+  disable:
+    - feature.bookmarks
+    - feature.history
+    - feature.downloads
+    - feature.find
+    - feature.reader
+    - feature.screenshot
+    - feature.adblock
+    - feature.palette
+    - feature.session
+    - feature.contextmenu
+    - feature.devtools
+    - theme.nucleus
+    - feature.inspector
+    - feature.tabsleep
+    - feature.notes
+    - feature.shortcuts
+    - feature.privacy
+
+settings:
+  "appearance.theme": dark
+  "plugin:ui.shell:showSuggestions": false

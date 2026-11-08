@@ -1,0 +1,30 @@
+# 展示形态：无标签栏干扰，深色，适合大屏演示
+#
+# 仍然保留地址栏（否则没法导航），但关掉一切「会弹东西」的插件。
+# 启动方式：Nucleus.exe --profile=kiosk
+
+plugins:
+  enable:
+    - ui.shell
+    - ui.window
+  disable:
+    - feature.bookmarks
+    - feature.history
+    - feature.downloads
+    - feature.reader
+    - feature.screenshot
+    - feature.adblock
+    - feature.palette
+    - feature.session
+    - feature.contextmenu
+    - feature.devtools
+    - feature.inspector
+    - feature.tabsleep
+    - feature.notes
+    - feature.shortcuts
+    - feature.privacy
+
+settings:
+  "appearance.theme": dark
+  "plugin:ui.shell:showSuggestions": false
+  "plugin:ui.shell:closeButton": false

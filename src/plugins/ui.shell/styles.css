@@ -1,0 +1,285 @@
+/* ==========================================================================
+   ui.shell · 浏览器基础界面样式
+   标签页、导航按钮、地址栏、补全下拉 —— 全部由这个插件拥有。
+   核不再持有这些选择器，替换整套界面只需要换一个插件。
+   ========================================================================== */
+
+/* ---------- 标签页 ---------- */
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  margin: 0 2px;
+  padding: 0 6px 0 9px;
+  min-width: 42px;
+  max-width: 210px;
+  flex: 1 1 150px;
+  align-self: center;
+  border-radius: var(--radius-s);
+  color: var(--text-dim);
+  background: transparent;
+  transition: background 130ms linear, color 130ms linear;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+  cursor: default;
+}
+
+.tab:hover { background: var(--bg-hover); color: var(--text); }
+
+.tab.active {
+  background: var(--bg-elev);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.tab.dragging { opacity: 0.5; }
+.tab.drop-before { box-shadow: inset 2px 0 0 var(--accent); }
+.tab.drop-after { box-shadow: inset -2px 0 0 var(--accent); }
+
+.tab .favicon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+}
+.tab .favicon img { width: 100%; height: 100%; }
+
+.tab .tab-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  letter-spacing: 0.1px;
+}
+
+.tab .tab-close {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 120ms linear, background 120ms linear;
+}
+.tab:hover .tab-close, .tab.active .tab-close { opacity: 1; }
+.tab .tab-close:hover { background: var(--bg-active); color: var(--text); }
+.tab .tab-close svg { width: 9px; height: 9px; }
+
+.tab-loading {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.6px solid var(--border-strong);
+  border-top-color: var(--accent);
+  animation: spin 700ms linear infinite;
+  flex: 0 0 auto;
+}
+
+.tabstrip .tab-new {
+  width: 26px;
+  height: 26px;
+  margin: 0 2px;
+  align-self: center;
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  flex: 0 0 auto;
+  -webkit-app-region: no-drag;
+}
+.tabstrip .tab-new:hover { background: var(--bg-hover); color: var(--text); }
+.tabstrip .tab-new svg { width: 13px; height: 13px; }
+
+/* 标签太多时自动收紧 */
+.tabstrip.dense .tab { flex-basis: 60px; padding-left: 7px; }
+.tabstrip.dense .tab .tab-title { font-size: 11px; }
+
+/* ---------- 导航按钮（复用核的 .navbtn，仅补充容器语义） ---------- */
+
+.nav-cluster {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+/* ---------- 地址栏 ---------- */
+
+.omnibox-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.omnibox {
+  flex: 1 1 auto;
+  min-width: 80px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 6px 0 10px;
+  background: var(--bg-input);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  transition: background 130ms linear, border-color 130ms linear, box-shadow 130ms linear;
+}
+
+.omnibox:hover { background: var(--bg-elev); }
+
+.omnibox:focus-within {
+  background: var(--bg-elev);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.omnibox .scheme-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.omnibox .scheme-icon.secure { color: var(--ok); }
+.omnibox .scheme-icon.insecure { color: var(--warn); }
+
+.omnibox input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text);
+  user-select: text;
+  cursor: text;
+}
+.omnibox input::placeholder { color: var(--text-faint); }
+.omnibox input::selection { background: var(--accent-soft); }
+
+/* ---------- 地址栏补全 ---------- */
+
+.suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  z-index: 50;
+  padding: 4px;
+}
+.suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: var(--radius-s);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  cursor: default;
+}
+.suggest-item .s-icon { width: 14px; height: 14px; flex: 0 0 auto; color: var(--text-faint); }
+.suggest-item .s-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.suggest-item .s-hint { font-size: 11px; color: var(--text-faint); flex: 0 0 auto; max-width: 45%; }
+.suggest-item.active, .suggest-item:hover { background: var(--accent-soft); }
+.suggest-empty { padding: 12px; text-align: center; color: var(--text-faint); font-size: 12px; }
+
+/* 加载进度条 */
+.loadbar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  width: 0;
+  background: var(--accent);
+  transition: width 180ms linear, opacity 300ms linear;
+  z-index: 60;
+  opacity: 0;
+}
+.loadbar.on { opacity: 1; }
+
+/* ---------- 槽位容器 ---------- */
+
+/* 地址栏内部的扩展位：书签星标这类动作放进这里，而不是工具栏外面 */
+.omnibox .omni-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  margin-left: 2px;
+}
+
+.omnibox .omni-actions .navbtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+}
+
+.omnibox .omni-actions .navbtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 状态栏条目 */
+.status-items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.status-adblock {
+  color: var(--accent);
+}
+
+/* 槽位渲染失败时的占位：不静默，也不炸整块界面 */
+.slot-error {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 95, 87, 0.14);
+  color: #ff5f57;
+  font-size: 11px;
+  cursor: help;
+}

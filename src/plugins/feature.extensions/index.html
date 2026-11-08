@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self' nucleus:; script-src 'self' nucleus:; style-src 'self' nucleus: 'unsafe-inline'; img-src 'self' nucleus: data: https: http:;">
+<title>扩展 · Nucleus</title>
+<link rel="stylesheet" href="extensions.css">
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+        <path d="M9 3h6v3.2a2.8 2.8 0 1 0 0 5.6V15h3.2a2.8 2.8 0 1 0 0-5.6V6H15V3"
+              fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M9 21h6v-3.2a2.8 2.8 0 1 1 0-5.6V9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      <span>浏览器扩展</span>
+      <span id="count" class="chip"></span>
+    </div>
+    <div class="actions">
+      <button id="reload" class="btn">重新扫描</button>
+      <button id="install" class="btn primary">安装扩展…</button>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="notice">
+      <b>这是 Chrome 扩展的一个可用子集，不是完整兼容。</b>
+      支持内容脚本、popup、选项页、MV2 后台页与消息路由；MV3 Service Worker、网络请求拦截、nativeMessaging 不支持。
+      每个扩展卡片上会逐项标出它用到了哪些不支持的能力。
+    </div>
+    <div id="list"><div class="empty">正在读取扩展目录…</div></div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

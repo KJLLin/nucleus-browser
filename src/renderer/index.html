@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self' nucleus:; script-src 'self' nucleus:; style-src 'self' nucleus: 'unsafe-inline'; img-src 'self' nucleus: data: https: http: blob:; font-src 'self' nucleus: data:; connect-src 'self' nucleus: https: http:;">
+<title>Nucleus</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/chrome.css">
+<link rel="stylesheet" href="styles/widgets.css">
+</head>
+<body>
+  <div id="shell">
+    <header id="topbar">
+      <div class="brand" title="Nucleus">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.2" fill="currentColor"/>
+          <ellipse cx="12" cy="12" rx="9.4" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.4"
+                   transform="rotate(-28 12 12)"/>
+          <ellipse cx="12" cy="12" rx="9.4" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.4"
+                   transform="rotate(28 12 12)"/>
+        </svg>
+      </div>
+
+      <!-- 标签栏：由插件填充，核只提供一个空区域 -->
+      <div class="tabstrip" data-region="tabstrip"></div>
+
+      <!-- 窗口按钮由 ui.window 插件注册，宿主只提供这个容器 -->
+      <div class="wincontrols" data-region="wincontrols"></div>
+    </header>
+
+    <div id="toolbar">
+      <div class="nav-left" data-region="nav-left"></div>
+      <div class="nav-center" data-region="nav-center"></div>
+      <div class="nav-right" data-region="nav-right"></div>
+    </div>
+
+    <main id="content">
+      <aside class="sidebar" data-region="sidebar" data-side="left" hidden></aside>
+      <div id="webarea"></div>
+    </main>
+  </div>
+
+  <div id="overlay" data-region="overlay"></div>
+  <div id="toasts" aria-live="polite"></div>
+  <div id="statusbar" data-region="statusbar"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

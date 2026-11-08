@@ -1,0 +1,19 @@
+{
+  "id": "feature.settings",
+  "name": "设置与插件管理",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "在独立页面里展示所有插件贡献的设置项，并管理插件的启用、禁用、安装与卸载。设置页本身也是插件。",
+  "main": "main.js",
+  "ui": "ui.js",
+  "permissions": ["plugins", "commands", "tabs", "settings", "shell", "session", "dialog"],
+  "contributes": {
+    "commands": [
+      { "id": "settings.open", "title": "打开设置", "icon": "settings", "keybinding": "Ctrl+," },
+      { "id": "settings.plugins", "title": "管理插件", "icon": "puzzle", "hidden": true }
+    ],
+    "toolbar": [
+      { "id": "settings.btn", "region": "nav-right", "icon": "settings", "title": "设置", "command": "settings.open", "order": 90 }
+    ]
+  }
+}

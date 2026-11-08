@@ -1,0 +1,26 @@
+{
+  "id": "feature.downloads",
+  "name": "下载管理",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "接管所有下载任务：工具栏进度角标、下载面板、完成后提示。",
+  "ui": "ui.js",
+  "permissions": [
+    "downloads",
+    "commands",
+    "shell"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "downloads.panel",
+        "title": "打开下载面板",
+        "icon": "download",
+        "keybinding": "Ctrl+J"
+      }
+    ],
+    "slots": [
+      "region.nav-right"
+    ]
+  }
+}

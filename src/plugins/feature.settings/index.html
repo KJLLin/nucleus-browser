@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self' nucleus:; script-src 'self' nucleus:; style-src 'self' 'unsafe-inline' nucleus:; img-src 'self' data:;">
+<title>设置 · Nucleus</title>
+<link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="back" id="back" title="返回">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="brand">
+      <span class="dot"></span>
+      <span>Nucleus 设置</span>
+    </div>
+    <div class="grow"></div>
+    <div class="search-wrap">
+      <input id="search" class="search" placeholder="搜索设置项…" spellcheck="false">
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="side" id="nav"></nav>
+    <main class="content" id="main"></main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "id": "feature.inspector",
+  "name": "运行时自省",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "把这台浏览器的内部状态摊开：插件树与 Cordis fiber、服务、槽位树与拒绝记录、RPC 契约覆盖率、事件流、配置层叠。",
+  "main": "main.js",
+  "ui": "ui.js",
+  "permissions": ["plugins", "tabs", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "inspector.open", "title": "打开运行时自省", "icon": "activity", "keybinding": "Ctrl+Alt+I" }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "feature.palette",
+  "name": "命令面板",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "按 Ctrl+K 呼出命令面板，搜索并执行任意已注册命令。核本身不知道有哪些命令，全部来自插件。",
+  "ui": "ui.js",
+  "permissions": ["commands", "tabs"],
+  "contributes": {
+    "commands": [
+      { "id": "palette.open", "title": "打开命令面板", "icon": "command", "keybinding": "Ctrl+K" },
+      { "id": "palette.openShift", "title": "打开命令面板（备用快捷键）", "icon": "command", "keybinding": "Ctrl+Shift+P", "hidden": true }
+    ]
+  }
+}

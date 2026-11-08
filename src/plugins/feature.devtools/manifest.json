@@ -1,0 +1,16 @@
+{
+  "id": "feature.devtools",
+  "name": "开发者工具",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "F12 打开当前页面的开发者工具，支持查看页面源代码与元素检查。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "devtools", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "devtools.toggle", "title": "打开 / 关闭开发者工具", "icon": "code", "keybinding": "F12" },
+      { "id": "devtools.inspect", "title": "检查元素", "icon": "cpu", "keybinding": "Ctrl+Shift+C" },
+      { "id": "devtools.viewSource", "title": "查看页面源代码", "icon": "file-text", "keybinding": "Ctrl+U" }
+    ]
+  }
+}

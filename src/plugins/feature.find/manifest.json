@@ -1,0 +1,16 @@
+{
+  "id": "feature.find",
+  "name": "页内查找",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "在当前页面内查找文字，带匹配计数与上下跳转。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "find.open", "title": "在页面中查找", "icon": "search", "keybinding": "Ctrl+F" },
+      { "id": "find.next", "title": "查找下一个", "icon": "chevron-down", "keybinding": "F3", "hidden": true },
+      { "id": "find.prev", "title": "查找上一个", "icon": "chevron-up", "keybinding": "Shift+F3", "hidden": true }
+    ]
+  }
+}

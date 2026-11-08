@@ -1,0 +1,33 @@
+{
+  "id": "feature.session",
+  "name": "会话恢复",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "退出时记住打开了哪些标签，下次启动按需恢复。会话数据由这个插件负责，核完全不管。",
+  "ui": "ui.js",
+  "permissions": ["tabs", "storage", "settings", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "session.restore", "title": "恢复上次会话", "icon": "history", "hidden": true },
+      { "id": "session.save", "title": "立即保存当前会话", "icon": "save", "hidden": true }
+    ],
+    "settings": [
+      {
+        "section": "启动与恢复",
+        "items": [
+          {
+            "key": "startup",
+            "label": "启动时",
+            "type": "select",
+            "default": "restore",
+            "options": [
+              { "value": "restore", "label": "恢复上次打开的标签" },
+              { "value": "newtab", "label": "打开新标签页" }
+            ]
+          },
+          { "key": "skipInternal", "label": "恢复时跳过浏览器内部页面", "type": "boolean", "default": true }
+        ]
+      }
+    ]
+  }
+}

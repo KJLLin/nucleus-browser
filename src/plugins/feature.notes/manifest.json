@@ -1,0 +1,25 @@
+{
+  "id": "feature.notes",
+  "name": "侧边便签",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "右侧抽屉里的一块随手记，输入即保存，存在插件自己的命名空间里。",
+  "ui": "ui.js",
+  "styles": ["notes.css"],
+  "permissions": ["storage", "commands", "settings"],
+  "contributes": {
+    "settings": [
+      {
+        "section": "侧边便签",
+        "items": [
+          { "key": "autoOpen", "label": "启动时自动打开便签", "type": "boolean", "default": false },
+          { "key": "mono", "label": "使用等宽字体", "type": "boolean", "default": false }
+        ]
+      }
+    ],
+    "commands": [
+      { "id": "notes.toggle", "title": "侧边便签", "icon": "file-text", "keybinding": "Ctrl+Shift+N" },
+      { "id": "notes.stamp", "title": "便签：插入当前时间", "icon": "clock", "hidden": true }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "id": "feature.adblock",
+  "name": "广告与追踪拦截",
+  "version": "1.0.0",
+  "author": "Nucleus",
+  "description": "在核的网络拦截总线上做域名级过滤，阻断常见广告与追踪请求，并把拦截计数显示在工具栏。",
+  "main": "main.js",
+  "ui": "ui.js",
+  "permissions": [
+    "network",
+    "storage",
+    "settings",
+    "commands",
+    "tabs"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "adblock.toggle",
+        "title": "启用 / 暂停广告拦截",
+        "icon": "shield"
+      },
+      {
+        "id": "adblock.stats",
+        "title": "查看拦截统计",
+        "icon": "shield",
+        "hidden": true
+      }
+    ],
+    "settings": [
+      {
+        "section": "广告与追踪拦截",
+        "items": [
+          {
+            "key": "enabled",
+            "label": "启用拦截",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "blockTrackers",
+            "label": "同时拦截统计与追踪脚本",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "blockPopups",
+            "label": "拦截弹窗广告脚本",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "strictness",
+            "label": "拦截强度",
+            "type": "select",
+            "default": "standard",
+            "options": [
+              {
+                "value": "light",
+                "label": "轻度（只拦最明显的广告域名）"
+              },
+              {
+                "value": "standard",
+                "label": "标准（推荐）"
+              },
+              {
+                "value": "strict",
+                "label": "严格（可能影响部分网站功能）"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "slots": [
+      "region.nav-right",
+      "shell.statusbar.items"
+    ]
+  }
+}
